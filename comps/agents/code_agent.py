@@ -23,7 +23,7 @@ import os
 from fastapi.responses import StreamingResponse
 from langchain_community.llms import HuggingFaceEndpoint
 from langsmith import traceable
-from langchain_community.chat_models.huggingface import ChatHuggingFace
+from langchain_openai import ChatOpenAI
 
 from comps import GeneratedDoc, LLMParamsDoc, ServiceType, opea_microservices, register_microservice
 
@@ -103,21 +103,7 @@ review_writing_human_template = """
 """
 review_writing_human_message_prompt = HumanMessagePromptTemplate.from_template(review_writing_human_template)
 
-
-llm_endpoint = os.getenv("TGI_LLM_ENDPOINT", "http://localhost:8080")
-hf_endpoint = HuggingFaceEndpoint(
-    endpoint_url=llm_endpoint,
-    max_new_tokens=1024,
-    top_k=10,
-    top_p=0.95,
-    typical_p=0.95,
-    temperature=0.01,
-    repetition_penalty=1.03,
-    streaming=False,
-    timeout=600,
-)
-
-model = ChatHuggingFace(llm=hf_endpoint)
+model = ChatOpenAI(openai_api_base="http://10.7.5.135:8080/v1")
 
 code_writing_prompt = ChatPromptTemplate.from_messages([code_writing_system_message_prompt,
                                                         code_writing_human_message_prompt])
@@ -128,21 +114,15 @@ code_writing_runnable = code_writing_prompt | model | output_parser
 
 ut_writing_prompt = ChatPromptTemplate.from_messages([ut_writing_system_message_prompt,
                                                       ut_writing_human_message_prompt])
-output_parser = StrOutputParser()
-
 ut_writing_runnable = ut_writing_prompt | model | output_parser
 
 
 document_writing_prompt = ChatPromptTemplate.from_messages([document_writing_system_message_prompt,
                                                            document_writing_human_message_prompt])
-output_parser = StrOutputParser()
-
 document_writing_runnable = document_writing_prompt | model | output_parser
 
 review_writing_prompt = ChatPromptTemplate.from_messages([review_writing_system_message_prompt,
                                                           review_writing_human_message_prompt])
-output_parser = StrOutputParser()
-
 review_writing_runnable = review_writing_prompt | model | output_parser
 
 
@@ -211,20 +191,8 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 ).partial(options=str(agent_options), members=", ".join(agent_tools))
 
-# Choose the LLM that will drive the agent
-stream_hf_endpoint = HuggingFaceEndpoint(
-    endpoint_url=llm_endpoint,
-    max_new_tokens=1024,
-    top_k=10,
-    top_p=0.95,
-    typical_p=0.95,
-    temperature=0.01,
-    repetition_penalty=1.03,
-    streaming=True,
-    timeout=600,
-)
-
-llm = ChatHuggingFace(llm=stream_hf_endpoint)
+# llm = ChatOpenAI(openai_api_base="http://10.7.5.135:8080/v1")
+llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
 
 # Construct the OpenAI Functions agent
 agent_runnable = create_openai_functions_agent(llm, [router], prompt)
@@ -374,9 +342,7 @@ def llm_generate(input: LLMParamsDoc):
 
 if __name__ == "__main__":
 
-    feature_request = """
-    Create a function that adds the two numbers together.
-    """
+    feature_request = """Load iris data from scikit-learn datasets and plot the training data."""
 
     inputs = {"messages": [HumanMessage(content=feature_request)]}
     for output in app.stream(inputs):
