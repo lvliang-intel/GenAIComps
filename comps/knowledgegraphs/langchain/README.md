@@ -55,7 +55,7 @@ docker run -p 8080:80 \
     -e HUGGING_FACE_HUB_TOKEN=$HUGGINGFACEHUB_API_TOKEN \
     --cap-add=sys_nice \
     --ipc=host \
-    ghcr.io/huggingface/tgi-gaudi:2.0.0 \
+    ghcr.io/huggingface/tgi-gaudi:2.0.5 \
     --model-id $LLM_MODEL \
     --max-input-tokens 1024 \
     --max-total-tokens 2048
