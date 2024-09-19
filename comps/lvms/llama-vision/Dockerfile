@@ -22,9 +22,6 @@ RUN git lfs install
 
 COPY comps /home/user/comps
 
-#RUN pip install --no-cache-dir --upgrade-strategy eager transformers
-RUN pip install transformers-4.45.0.dev0-py3-none-any.whl
-
 RUN cd /home/user/comps/lvms/llama-vision/ && \
     pip install --no-cache-dir -r requirements.txt
 

@@ -15,7 +15,7 @@ docker build -t opea/lvm-llama-vision:latest --build-arg https_proxy=$https_prox
 ### Start LLaVA and LVM Service
 
 ```bash
-docker run -p 9399:9399 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e LLAMA_VISION_MODEL_ID="/mnt/models/Llama-3.2-11B-Vision-Instruct" opea/lvm-llava-svc:latest
+docker run -p 9399:9399 --ipc=host -e http_proxy=$http_proxy -e https_proxy=$https_proxy -e LLAMA_VISION_MODEL_ID="/mnt/models/Llama-3.2-11B-Vision-Instruct" opea/lvm-llama-vision:latest
 ```
 
 ### Test
